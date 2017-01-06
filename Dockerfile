@@ -97,8 +97,12 @@ RUN set -x \
 # Make apache include custom conf dirs (will add php.conf here)
 	&& echo "Include conf/conf.d/*.conf" | tee -a "${HTTPD_PREFIX}/conf/httpd.conf" \
 # Uinstall build deps - only at the end as they are needed for xdebug install too
-	&& apk del .build-deps
+	&& apk del .build-deps \
+# Create sessions dir - 777 should be fine in the container
+	&& mkdir -p /var/lib/php/session \
+        && chmod 777 /var/lib/php/session
 
 ADD     docker/docker-php-* /usr/local/bin/
 ADD     php.conf "${HTTPD_PREFIX}/conf/conf.d/php.conf"
+ADD	php.ini "${PHP_INI_DIR}/php.ini"
 ADD	xdebug.ini "$PHP_INI_DIR/conf.d/xdebug.ini"
